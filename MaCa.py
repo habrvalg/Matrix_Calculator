@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QTextEdit, QPushButton, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QTextEdit, QPushButton, QVBoxLayout, QMessageBox, QWidget
 
 
 class MatrixCalculatorApp(QMainWindow):
@@ -50,32 +50,48 @@ class MatrixCalculatorApp(QMainWindow):
         self.setCentralWidget(container)
 
     def get_matrices(self):
-        matrix1 = np.array(
-            [[float(entry) for entry in row.split()] for row in self.matrix1_entry.toPlainText().split("\n")])
-        matrix2 = np.array(
-            [[float(entry) for entry in row.split()] for row in self.matrix2_entry.toPlainText().split("\n")])
+        matrix1_text = self.matrix1_entry.toPlainText()
+        matrix2_text = self.matrix2_entry.toPlainText()
+
+        if not matrix1_text or not matrix2_text:
+            self.show_error("Введите матрицу")
+            return None, None
+
+        matrix1 = np.array([[float(entry) for entry in row.split()] for row in matrix1_text.split("\n")])
+        matrix2 = np.array([[float(entry) for entry in row.split()] for row in matrix2_text.split("\n")])
         return matrix1, matrix2
 
     def calculate_addition(self):
         matrix1, matrix2 = self.get_matrices()
-        result = np.add(matrix1, matrix2)
-        self.result_display.setText("Результат:\n" + str(result))
+        if matrix1 is not None and matrix2 is not None:
+            result = np.add(matrix1, matrix2)
+            self.result_display.setText("Результат:\n" + str(result))
 
     def calculate_subtraction(self):
         matrix1, matrix2 = self.get_matrices()
-        result = np.subtract(matrix1, matrix2)
-        self.result_display.setText("Результат:\n" + str(result))
+        if matrix1 is not None and matrix2 is not None:
+            result = np.subtract(matrix1, matrix2)
+            self.result_display.setText("Результат:\n" + str(result))
 
     def calculate_scalar_mult(self):
         matrix1, _ = self.get_matrices()
-        scalar = float(input("Введите число для умножения: "))
-        result = np.multiply(scalar, matrix1)
-        self.result_display.setText("Результат:\n" + str(result))
+        if matrix1 is not None:
+            scalar = float(input("Введите число для умножения: "))
+            result = np.multiply(scalar, matrix1)
+            self.result_display.setText("Результат:\n" + str(result))
 
     def calculate_matrix_mult(self):
         matrix1, matrix2 = self.get_matrices()
-        result = np.dot(matrix1, matrix2)
-        self.result_display.setText("Результат:\n" + str(result))
+        if matrix1 is not None and matrix2 is not None:
+            result = np.dot(matrix1, matrix2)
+            self.result_display.setText("Результат:\n" + str(result))
+
+    def show_error(self, message):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Critical)
+        msg_box.setWindowTitle("Ошибка")
+        msg_box.setText(message)
+        msg_box.exec_()
 
 
 if __name__ == "__main__":
