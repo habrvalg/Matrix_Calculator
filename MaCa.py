@@ -1,6 +1,7 @@
 import numpy as np
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QTextEdit, QPushButton, QVBoxLayout, QMessageBox, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QTextEdit, QPushButton, QVBoxLayout, QGridLayout, \
+    QWidget, QLineEdit, QMessageBox
 
 
 class MatrixCalculatorApp(QMainWindow):
@@ -12,11 +13,16 @@ class MatrixCalculatorApp(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.matrix1_label = QLabel("Введите матрицу 1 (разделяйте числа пробелами, строки - переносами):")
-        self.matrix1_entry = QTextEdit()
+        self.matrix_size_label = QLabel("Выберите размер матрицы:")
+        self.matrix_size_input = QLineEdit()
+        self.create_matrix_button = QPushButton("Создать матрицы")
+        self.create_matrix_button.clicked.connect(self.create_matrices)
 
-        self.matrix2_label = QLabel("Введите матрицу 2 (разделяйте числа пробелами, строки - переносами):")
-        self.matrix2_entry = QTextEdit()
+        self.matrix1_label = QLabel("Матрица 1:")
+        self.matrix1_layout = QGridLayout()
+
+        self.matrix2_label = QLabel("Матрица 2:")
+        self.matrix2_layout = QGridLayout()
 
         self.result_label = QLabel("Результат:")
         self.result_display = QTextEdit()
@@ -34,10 +40,13 @@ class MatrixCalculatorApp(QMainWindow):
         self.matrix_mult_button.clicked.connect(self.calculate_matrix_mult)
 
         layout = QVBoxLayout()
+        layout.addWidget(self.matrix_size_label)
+        layout.addWidget(self.matrix_size_input)
+        layout.addWidget(self.create_matrix_button)
         layout.addWidget(self.matrix1_label)
-        layout.addWidget(self.matrix1_entry)
+        layout.addLayout(self.matrix1_layout)
         layout.addWidget(self.matrix2_label)
-        layout.addWidget(self.matrix2_entry)
+        layout.addLayout(self.matrix2_layout)
         layout.addWidget(self.addition_button)
         layout.addWidget(self.subtraction_button)
         layout.addWidget(self.scalar_mult_button)
@@ -49,48 +58,64 @@ class MatrixCalculatorApp(QMainWindow):
         container.setLayout(layout)
         self.setCentralWidget(container)
 
-    def get_matrices(self):
-        matrix1_text = self.matrix1_entry.toPlainText()
-        matrix2_text = self.matrix2_entry.toPlainText()
+        self.matrix1 = None
+        self.matrix2 = None
+        self.matrix_input_fields1 = []
+        self.matrix_input_fields2 = []
 
-        matrix1 = self.parse_matrix(matrix1_text)
-        matrix2 = self.parse_matrix(matrix2_text)
-        return matrix1, matrix2
-
-    def parse_matrix(self, matrix_text):
-        matrix = []
+    def create_matrices(self):
         try:
-            rows = matrix_text.strip().split("\n")
-            for row in rows:
-                entries = row.split()
-                row_entries = [float(entry) if entry else 0 for entry in entries]
-                matrix.append(row_entries)
-        except (ValueError, IndexError):
-            self.show_error("Некорректный ввод матрицы")
-            return None
+            matrix_size = int(self.matrix_size_input.text())
+            self.create_matrix_layout(self.matrix1_layout, matrix_size, self.matrix_input_fields1)
+            self.create_matrix_layout(self.matrix2_layout, matrix_size, self.matrix_input_fields2)
+        except ValueError:
+            self.show_error("Введите корректный размер матрицы")
+
+    def create_matrix_layout(self, layout, size, input_fields_list):
+        for row in range(size):
+            input_fields_row = []
+            for col in range(size):
+                entry = QLineEdit()
+                layout.addWidget(entry, row, col)
+                input_fields_row.append(entry)
+            input_fields_list.append(input_fields_row)
+
+    def get_matrices(self, input_fields_list):
+        matrix = []
+        for row_inputs in input_fields_list:
+            row_entries = []
+            for entry in row_inputs:
+                if entry.text():
+                    row_entries.append(float(entry.text()))
+                else:
+                    row_entries.append(0)
+            matrix.append(row_entries)
         return np.array(matrix)
 
     def calculate_addition(self):
-        matrix1, matrix2 = self.get_matrices()
+        matrix1 = self.get_matrices(self.matrix_input_fields1)
+        matrix2 = self.get_matrices(self.matrix_input_fields2)
         if matrix1 is not None and matrix2 is not None:
             result = np.add(matrix1, matrix2)
             self.result_display.setText("Результат:\n" + str(result))
 
     def calculate_subtraction(self):
-        matrix1, matrix2 = self.get_matrices()
+        matrix1 = self.get_matrices(self.matrix_input_fields1)
+        matrix2 = self.get_matrices(self.matrix_input_fields2)
         if matrix1 is not None and matrix2 is not None:
             result = np.subtract(matrix1, matrix2)
             self.result_display.setText("Результат:\n" + str(result))
 
     def calculate_scalar_mult(self):
-        matrix1, _ = self.get_matrices()
+        matrix1 = self.get_matrices(self.matrix_input_fields1)
         if matrix1 is not None:
             scalar = float(input("Введите число для умножения: "))
             result = np.multiply(scalar, matrix1)
             self.result_display.setText("Результат:\n" + str(result))
 
     def calculate_matrix_mult(self):
-        matrix1, matrix2 = self.get_matrices()
+        matrix1 = self.get_matrices(self.matrix_input_fields1)
+        matrix2 = self.get_matrices(self.matrix_input_fields2)
         if matrix1 is not None and matrix2 is not None:
             result = np.dot(matrix1, matrix2)
             self.result_display.setText("Результат:\n" + str(result))
