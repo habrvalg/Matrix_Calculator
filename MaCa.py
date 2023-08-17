@@ -29,6 +29,7 @@ class MatrixCalculatorApp(QMainWindow):
 
         self.result_label = QLabel("Результат:")
         self.result_display = QTextEdit()
+        self.result_display.setReadOnly(True)
 
         self.addition_button = QPushButton("Сложение")
         self.addition_button.clicked.connect(self.calculate_addition)
@@ -71,13 +72,15 @@ class MatrixCalculatorApp(QMainWindow):
     def create_matrices(self):
         try:
             matrix_size = int(self.matrix_size_input.text())
+            if matrix_size > 10:
+                self.show_error("Размер матрицы не должен превышать 10")
+                return
             self.create_matrix_layout(self.matrix1_layout, matrix_size, self.matrix_input_fields1)
             self.create_matrix_layout(self.matrix2_layout, matrix_size, self.matrix_input_fields2)
         except ValueError:
             self.show_error("Введите корректный размер матрицы")
 
     def create_matrix_layout(self, layout, size, input_fields_list):
-        # Очищаем предыдущие поля ввода, если они были
         self.clear_matrix_layout(layout, input_fields_list)
 
         for row in range(size):
