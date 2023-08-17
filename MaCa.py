@@ -65,7 +65,7 @@ class MatrixCalculatorApp(QMainWindow):
                 entries = row.split()
                 row_entries = [float(entry) if entry else 0 for entry in entries]
                 matrix.append(row_entries)
-        except ValueError:
+        except (ValueError, IndexError):
             self.show_error("Некорректный ввод матрицы")
             return None
         return np.array(matrix)
