@@ -1,7 +1,6 @@
 import numpy as np
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QTextEdit, QPushButton, QVBoxLayout, QGridLayout, \
-    QWidget, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QTextEdit, QPushButton, QVBoxLayout, QGridLayout,QWidget, QLineEdit, QMessageBox
 
 
 class MatrixCalculatorApp(QMainWindow):
