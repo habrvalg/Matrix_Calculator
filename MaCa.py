@@ -58,12 +58,16 @@ class MatrixCalculatorApp(QMainWindow):
         return matrix1, matrix2
 
     def parse_matrix(self, matrix_text):
-        rows = matrix_text.split("\n")
         matrix = []
-        for row in rows:
-            entries = row.split()
-            row_entries = [float(entry) if entry else 0 for entry in entries]
-            matrix.append(row_entries)
+        try:
+            rows = matrix_text.strip().split("\n")
+            for row in rows:
+                entries = row.split()
+                row_entries = [float(entry) if entry else 0 for entry in entries]
+                matrix.append(row_entries)
+        except ValueError:
+            self.show_error("Некорректный ввод матрицы")
+            return None
         return np.array(matrix)
 
     def calculate_addition(self):
