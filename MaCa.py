@@ -77,6 +77,9 @@ class MatrixCalculatorApp(QMainWindow):
             self.show_error("Введите корректный размер матрицы")
 
     def create_matrix_layout(self, layout, size, input_fields_list):
+        # Очищаем предыдущие поля ввода, если они были
+        self.clear_matrix_layout(layout, input_fields_list)
+
         for row in range(size):
             input_fields_row = []
             for col in range(size):
@@ -84,6 +87,13 @@ class MatrixCalculatorApp(QMainWindow):
                 layout.addWidget(entry, row, col)
                 input_fields_row.append(entry)
             input_fields_list.append(input_fields_row)
+
+    def clear_matrix_layout(self, layout, input_fields_list):
+        for row_inputs in input_fields_list:
+            for entry in row_inputs:
+                layout.removeWidget(entry)
+                entry.deleteLater()
+        input_fields_list.clear()
 
     def get_matrices(self, input_fields_list):
         matrix = []
