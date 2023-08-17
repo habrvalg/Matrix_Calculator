@@ -24,6 +24,9 @@ class MatrixCalculatorApp(QMainWindow):
         self.matrix2_label = QLabel("Матрица 2:")
         self.matrix2_layout = QGridLayout()
 
+        self.scalar_label = QLabel("Введите число для умножения:")
+        self.scalar_input = QLineEdit()
+
         self.result_label = QLabel("Результат:")
         self.result_display = QTextEdit()
 
@@ -47,6 +50,8 @@ class MatrixCalculatorApp(QMainWindow):
         layout.addLayout(self.matrix1_layout)
         layout.addWidget(self.matrix2_label)
         layout.addLayout(self.matrix2_layout)
+        layout.addWidget(self.scalar_label)
+        layout.addWidget(self.scalar_input)
         layout.addWidget(self.addition_button)
         layout.addWidget(self.subtraction_button)
         layout.addWidget(self.scalar_mult_button)
@@ -108,8 +113,8 @@ class MatrixCalculatorApp(QMainWindow):
 
     def calculate_scalar_mult(self):
         matrix1 = self.get_matrices(self.matrix_input_fields1)
+        scalar = float(self.scalar_input.text())
         if matrix1 is not None:
-            scalar = float(input("Введите число для умножения: "))
             result = np.multiply(scalar, matrix1)
             self.result_display.setText("Результат:\n" + str(result))
 
