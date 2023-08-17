@@ -53,13 +53,18 @@ class MatrixCalculatorApp(QMainWindow):
         matrix1_text = self.matrix1_entry.toPlainText()
         matrix2_text = self.matrix2_entry.toPlainText()
 
-        if not matrix1_text or not matrix2_text:
-            self.show_error("Введите матрицу")
-            return None, None
-
-        matrix1 = np.array([[float(entry) for entry in row.split()] for row in matrix1_text.split("\n")])
-        matrix2 = np.array([[float(entry) for entry in row.split()] for row in matrix2_text.split("\n")])
+        matrix1 = self.parse_matrix(matrix1_text)
+        matrix2 = self.parse_matrix(matrix2_text)
         return matrix1, matrix2
+
+    def parse_matrix(self, matrix_text):
+        rows = matrix_text.split("\n")
+        matrix = []
+        for row in rows:
+            entries = row.split()
+            row_entries = [float(entry) if entry else 0 for entry in entries]
+            matrix.append(row_entries)
+        return np.array(matrix)
 
     def calculate_addition(self):
         matrix1, matrix2 = self.get_matrices()
