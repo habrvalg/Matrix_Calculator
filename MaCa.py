@@ -1,50 +1,54 @@
 import numpy as np
-import tkinter as tk
-from tkinter import ttk
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QWidget
 
 
-class MatrixCalculatorApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Матричный калькулятор")
+class MatrixCalculatorApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Матричный калькулятор")
+        self.setGeometry(100, 100, 400, 400)
 
-        self.create_widgets()
+        self.init_ui()
 
-    def create_widgets(self):
-        self.operation_var = tk.StringVar()
-        self.operation_var.set("Сложение")
+    def init_ui(self):
+        self.operation_label = QLabel("Выберите операцию:")
+        self.operation_menu = QLineEdit()
+        self.operation_menu.setPlaceholderText("Сложение / Вычитание / Умножение на число / Умножение")
 
-        operation_label = tk.Label(self.root, text="Выберите операцию:")
-        operation_label.pack(pady=10)
+        self.matrix1_label = QLabel("Введите матрицу 1:")
+        self.matrix1_entry = QTextEdit()
 
-        operation_menu = ttk.Combobox(self.root, textvariable=self.operation_var,
-                                      values=["Сложение", "Вычитание", "Умножение на число", "Умножение"])
-        operation_menu.pack()
+        self.matrix2_label = QLabel("Введите матрицу 2:")
+        self.matrix2_entry = QTextEdit()
 
-        matrix1_label = tk.Label(self.root, text="Введите матрицу 1:")
-        matrix1_label.pack(pady=10)
+        self.calculate_button = QPushButton("Вычислить")
+        self.calculate_button.clicked.connect(self.calculate)
 
-        self.matrix1_entry = tk.Text(self.root, height=5, width=20)
-        self.matrix1_entry.pack()
+        self.result_label = QLabel("Результат:")
+        self.result_display = QTextEdit()
 
-        matrix2_label = tk.Label(self.root, text="Введите матрицу 2:")
-        matrix2_label.pack(pady=10)
+        layout = QVBoxLayout()
+        layout.addWidget(self.operation_label)
+        layout.addWidget(self.operation_menu)
+        layout.addWidget(self.matrix1_label)
+        layout.addWidget(self.matrix1_entry)
+        layout.addWidget(self.matrix2_label)
+        layout.addWidget(self.matrix2_entry)
+        layout.addWidget(self.calculate_button)
+        layout.addWidget(self.result_label)
+        layout.addWidget(self.result_display)
 
-        self.matrix2_entry = tk.Text(self.root, height=5, width=20)
-        self.matrix2_entry.pack()
-
-        calculate_button = tk.Button(self.root, text="Вычислить", command=self.calculate)
-        calculate_button.pack(pady=10)
-
-        self.result_label = tk.Label(self.root, text="Результат:")
-        self.result_label.pack()
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
 
     def calculate(self):
-        operation = self.operation_var.get()
-        matrix1 = np.array([[float(entry) for entry in row.split()] for row in
-                            self.matrix1_entry.get("1.0", "end").strip().split("\n")])
-        matrix2 = np.array([[float(entry) for entry in row.split()] for row in
-                            self.matrix2_entry.get("1.0", "end").strip().split("\n")])
+        operation = self.operation_menu.text()
+        matrix1 = np.array(
+            [[float(entry) for entry in row.split()] for row in self.matrix1_entry.toPlainText().split("\n")])
+        matrix2 = np.array(
+            [[float(entry) for entry in row.split()] for row in self.matrix2_entry.toPlainText().split("\n")])
 
         if operation == "Сложение":
             result = np.add(matrix1, matrix2)
@@ -56,10 +60,11 @@ class MatrixCalculatorApp:
         elif operation == "Умножение":
             result = np.dot(matrix1, matrix2)
 
-        self.result_label.config(text="Результат:\n" + str(result))
+        self.result_display.setText("Результат:\n" + str(result))
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = MatrixCalculatorApp(root)
-    root.mainloop()
+    app = QApplication(sys.argv)
+    window = MatrixCalculatorApp()
+    window.show()
+    sys.exit(app.exec_())
